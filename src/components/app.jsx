@@ -9,6 +9,7 @@ import {
 import CategoryList from './category-list';
 import DetailItem from './detail-item';
 import AboutPage from './about-page';
+import ChatbotPage from './chatbot-page';
 import Footer from './footer';
 import NotFound from './not-found';
 import Header from './header';
@@ -32,6 +33,7 @@ export class App extends React.Component {
                     <Header />
 
                     <Switch>
+                        <Route exact path="/" component={ChatbotPage} />
                         <Route exact path="/dev" render={(props) => <CategoryList {...props} />} />
                         <Route exact path="/design" render={(props) => <CategoryList {...props} />} />
                         <Route exact path="/photo" render={(props) => <CategoryList {...props} />} />
@@ -51,12 +53,9 @@ export class App extends React.Component {
                             ))
                         }
 
-                        <Route exact path="/">
-                            <Redirect to="/dev" />
-                        </Route>
                         { /*This is to handle any indexed /web search results*/ }
                         <Route exact path="/web">
-                            <Redirect to="/dev" />
+                            <Redirect to="/" />
                         </Route>
 
                         <Route path="*" component={NotFound} />

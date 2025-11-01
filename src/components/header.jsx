@@ -24,7 +24,7 @@ export default class Header extends React.Component {
                 <div className="grid-d-12">
                     <div className="top-header">
                         <div id="logo">
-                            <h1><NavLink to={"/dev"} onClick={this.closeNav}>Cory Fitzpatrick | Software Tech Lead</NavLink></h1>
+                            <h1><NavLink to={"/"} onClick={this.closeNav}>Cory Fitzpatrick | Software Tech Lead</NavLink></h1>
                         </div>
 
                         <div className="mobile-nav-link" onClick={this.mobileNavToggle}></div>
