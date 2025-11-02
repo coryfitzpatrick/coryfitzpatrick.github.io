@@ -315,14 +315,17 @@
 }
 
 .fullscreen-toggle {
-  position: absolute;
-  top: 10px;
-  right: 10px;
+  position: sticky;
+  top: 0;
+  align-self: flex-end;
   background: #1e1c1c;
   border: 2px solid #444;
+  border-radius: 0;
   color: #fff;
   width: 40px;
   height: 40px;
+  min-width: 40px;
+  min-height: 40px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -330,26 +333,21 @@
   font-size: 20px;
   transition: all 0.2s;
   z-index: 10;
+  margin-bottom: -40px;
+  flex-shrink: 0;
+  padding: 0;
 
   @media screen and (max-width: 768px) {
     width: 36px;
     height: 36px;
+    min-width: 36px;
+    min-height: 36px;
     font-size: 18px;
+    margin-bottom: -36px;
   }
 
   &:hover {
     background: #2c2a2a;
     border-color: #777;
-  }
-}
-
-.chat-container.fullscreen .fullscreen-toggle {
-  position: fixed;
-  top: 30px;
-  right: 30px;
-
-  @media screen and (max-width: 768px) {
-    top: 20px;
-    right: 20px;
   }
 }
