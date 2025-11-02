@@ -8,12 +8,20 @@ export default class ChatbotPage extends React.Component {
         this.state = {
             messages: [],
             inputValue: '',
-            isLoading: false
+            isLoading: false,
+            isFullscreen: false
         };
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
         this.handleExampleClick = this.handleExampleClick.bind(this);
+        this.toggleFullscreen = this.toggleFullscreen.bind(this);
         this.messagesEndRef = React.createRef();
+    }
+
+    toggleFullscreen() {
+        this.setState(prevState => ({
+            isFullscreen: !prevState.isFullscreen
+        }));
     }
 
     handleExampleClick(question) {
@@ -131,11 +139,20 @@ export default class ChatbotPage extends React.Component {
                     ))}
                 </div>
 
-                <div className="chat-header">
-                    <h2>Ask me about Cory's skills and experience</h2>
+                <div className={`chat-container ${this.state.isFullscreen ? 'fullscreen' : ''}`}>
+                    <div className="chat-header">
+                        <h2>Ask me about Cory's skills and experience</h2>
 
-                    <p className="chat-subtitle">I'm an AI assistant that can help you learn about Cory's technical abilities and work history.</p>
-                </div>
+                        <p className="chat-subtitle">I'm an AI assistant that can help you learn about Cory's technical abilities and work history.</p>
+
+                        <button
+                            className="fullscreen-toggle"
+                            onClick={this.toggleFullscreen}
+                            aria-label={this.state.isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+                        >
+                            {this.state.isFullscreen ? '✕' : '⛶'}
+                        </button>
+                    </div>
 
                 <div className="chat-messages">
                     {this.state.messages.length === 0 && (
@@ -210,6 +227,7 @@ export default class ChatbotPage extends React.Component {
                         </button>
                     </div>
                 </form>
+                </div>
             </div>
         );
     }
