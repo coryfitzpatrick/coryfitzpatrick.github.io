@@ -6,7 +6,7 @@ export default class CategoryList extends React.Component {
     render() {
         let url = this.props.location.pathname;
         let category = url.replace(/[^\w\s]/gi, '');
-        let items = portfolioData[category] || portfolioData.dev;
+        let items = portfolioData[category]?.items || portfolioData.dev.items;
 
         return (
             <div id="content">

@@ -5,8 +5,8 @@ export default class DetailItemContent extends React.Component {
     render() {
         const path = this.props.location.pathname;
         const category = path.split('/')[1];
-        const objectNum = portfolioData[category].findIndex(item => item.url === path);
-        const detailItem = portfolioData[category][objectNum];
+        const objectNum = portfolioData[category].items.findIndex(item => item.url === path);
+        const detailItem = portfolioData[category].items[objectNum];
         const subContent = detailItem.subContent;
         let subContentTitle;
         let subContentLink;

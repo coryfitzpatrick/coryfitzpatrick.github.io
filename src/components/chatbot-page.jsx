@@ -2,6 +2,7 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import RobotIcon from './robot-icon';
 import { trackEvent } from '../utils/analytics';
+import data from '../data/data.json';
 
 export default class ChatbotPage extends React.Component {
     constructor(props) {
@@ -126,11 +127,7 @@ export default class ChatbotPage extends React.Component {
     }
 
     render() {
-        const categories = [
-            { name: 'Dev', path: '/dev', image: '/images/dev/vi-1-thumb.jpg' },
-            { name: 'Design', path: '/design', image: '/images/design/washed-away-thumb.jpg' },
-            { name: 'Photo', path: '/photo', image: '/images/photo/garden-thumb.jpg' }
-        ];
+        const categories = data.categories;
 
         return (
             <div id="content">

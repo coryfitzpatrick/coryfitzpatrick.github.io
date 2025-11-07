@@ -66,7 +66,7 @@ export class App extends React.Component {
                                 and then loops through all the projects in a given category
                             */
                             categories.map((category, categoryIndex) => (
-                                category.map((item, itemIndex) => (
+                                category.items.map((item, itemIndex) => (
                                     <Route key={`${categoryIndex}-${itemIndex}`} exact path={item.url} component={DetailItem}/>
                                 ))
                             ))
