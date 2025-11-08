@@ -31,13 +31,13 @@ describe('AboutPage Component', () => {
     render(<AboutPage />);
 
     // Assert
-    const githubLink = screen.getByRole('link', { name: /Check Out This Sites Code on Github/i });
+    const githubLink = screen.getByRole('link', { name: /Check out this site's React code on GitHub/i });
     const linkedinLink = screen.getByRole('link', { name: /LinkedIn/i });
 
     expect(githubLink).toBeInTheDocument();
     expect(linkedinLink).toBeInTheDocument();
 
-    expect(githubLink).toHaveAttribute('href', 'https://github.com/fitzmx6/fitzmx6.github.io');
+    expect(githubLink).toHaveAttribute('href', 'https://github.com/coryfitzpatrick/coryfitzpatrick.github.io');
     expect(linkedinLink).toHaveAttribute('href', 'https://www.linkedin.com/in/coryfitzpatrick');
   });
 

@@ -1,45 +1,56 @@
-import React from 'react';
-import {NavLink} from "react-router-dom";
+import React, { useState, useCallback } from 'react';
+import { NavLink } from 'react-router-dom';
+import { SITE_TITLE, NAV_ITEMS } from '../constants/navigation';
 
-export default class Header extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {open: false};
-        this.mobileNavToggle = this.mobileNavToggle.bind(this);
-        this.closeNav = this.closeNav.bind(this);
-    }
+export default function Header() {
+    const [isOpen, setIsOpen] = useState(false);
 
-    closeNav() {
-        if (this.state.open) {
-            this.setState({open: false});
+    const closeNav = useCallback(() => {
+        if (isOpen) {
+            setIsOpen(false);
         }
-    }
+    }, [isOpen]);
 
-    mobileNavToggle() {
-        this.setState({open: !this.state.open});
-    }
-    render() {
-        return (
-            <header className={(this.state.open ? "open-nav" : "")}>
-                <div className="grid-d-12">
-                    <div className="top-header">
-                        <div id="logo">
-                            <h1><NavLink to={"/"} onClick={this.closeNav}>Cory Fitzpatrick | Software Tech Lead</NavLink></h1>
-                        </div>
+    const toggleNav = useCallback(() => {
+        setIsOpen(prev => !prev);
+    }, []);
 
-                        <div className="mobile-nav-link" onClick={this.mobileNavToggle}></div>
+    return (
+        <header className={isOpen ? "open-nav" : ""}>
+            <div className="grid-d-12">
+                <div className="top-header">
+                    <div id="logo">
+                        <h1>
+                            <NavLink to="/" onClick={closeNav}>
+                                {SITE_TITLE}
+                            </NavLink>
+                        </h1>
                     </div>
 
-                    <nav>
-                        <ul>
-                            <li><NavLink to={"/dev"} onClick={this.closeNav}>Dev</NavLink></li>
-                            <li><NavLink to={"/design"} onClick={this.closeNav}>Design</NavLink></li>
-                            <li><NavLink to={"/photo"} onClick={this.closeNav}>Photo</NavLink></li>
-                            <li><NavLink to={"/about"} onClick={this.closeNav}>About</NavLink></li>
-                        </ul>
-                    </nav>
+                    <button
+                        className="mobile-nav-link"
+                        onClick={toggleNav}
+                        aria-label="Toggle navigation menu"
+                        aria-expanded={isOpen}
+                    />
                 </div>
-            </header>
-        );
-    }
+
+                <nav>
+                    <ul>
+                        {NAV_ITEMS.map(item => (
+                            <li key={item.path}>
+                                <NavLink
+                                    to={item.path}
+                                    activeClassName="active"
+                                    onClick={closeNav}
+                                >
+                                    {item.label}
+                                </NavLink>
+                            </li>
+                        ))}
+                    </ul>
+                </nav>
+            </div>
+        </header>
+    );
 }

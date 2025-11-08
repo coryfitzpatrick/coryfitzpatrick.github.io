@@ -1,47 +1,46 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import ChatbotPage from './chatbot-page';
+import HomePage from './home-page';
 
 // Mock scrollIntoView
 Element.prototype.scrollIntoView = jest.fn();
 
-describe('ChatbotPage', () => {
+describe('HomePage', () => {
   const renderWithRouter = (component) => {
     return render(<BrowserRouter>{component}</BrowserRouter>);
   };
 
   it('renders without crashing', () => {
-    renderWithRouter(<ChatbotPage />);
+    renderWithRouter(<HomePage />);
   });
 
   it('displays the welcome message when no messages', () => {
-    renderWithRouter(<ChatbotPage />);
+    renderWithRouter(<HomePage />);
     expect(screen.getByText(/Welcome! Ask me anything about Cory's technical skills/i)).toBeInTheDocument();
   });
 
   it('displays category cards', () => {
-    renderWithRouter(<ChatbotPage />);
+    renderWithRouter(<HomePage />);
+    expect(screen.getByText('AI')).toBeInTheDocument();
     expect(screen.getByText('Dev')).toBeInTheDocument();
-    expect(screen.getByText('Design')).toBeInTheDocument();
-    expect(screen.getByText('Photo')).toBeInTheDocument();
   });
 
   it('has an input field for user messages', () => {
-    renderWithRouter(<ChatbotPage />);
+    renderWithRouter(<HomePage />);
     const input = screen.getByPlaceholderText(/Ask me about Cory/i);
     expect(input).toBeInTheDocument();
   });
 
   it('updates input value when typing', () => {
-    renderWithRouter(<ChatbotPage />);
+    renderWithRouter(<HomePage />);
     const input = screen.getByPlaceholderText(/Ask me about Cory/i);
     fireEvent.change(input, { target: { value: 'What are your skills?' } });
     expect(input.value).toBe('What are your skills?');
   });
 
   it('has example questions', () => {
-    renderWithRouter(<ChatbotPage />);
+    renderWithRouter(<HomePage />);
     expect(screen.getByText(/What are Cory's technical skills?/i)).toBeInTheDocument();
   });
 
@@ -58,7 +57,7 @@ describe('ChatbotPage', () => {
       })
     );
 
-    const { container } = renderWithRouter(<ChatbotPage />);
+    const { container } = renderWithRouter(<HomePage />);
     const exampleButton = screen.getByText(/What are Cory's technical skills?/i);
 
     fireEvent.click(exampleButton);
@@ -72,19 +71,19 @@ describe('ChatbotPage', () => {
   });
 
   it('renders fullscreen toggle button', () => {
-    renderWithRouter(<ChatbotPage />);
+    renderWithRouter(<HomePage />);
     const toggleButton = screen.getByRole('button', { name: /Enter fullscreen/i });
     expect(toggleButton).toBeInTheDocument();
   });
 
   it('displays expand icon when not in fullscreen', () => {
-    renderWithRouter(<ChatbotPage />);
+    renderWithRouter(<HomePage />);
     const toggleButton = screen.getByRole('button', { name: /Enter fullscreen/i });
     expect(toggleButton).toHaveTextContent('⛶');
   });
 
   it('toggles fullscreen mode when clicking button', () => {
-    const { container } = renderWithRouter(<ChatbotPage />);
+    const { container } = renderWithRouter(<HomePage />);
     const toggleButton = screen.getByRole('button', { name: /Enter fullscreen/i });
     const chatContainer = container.querySelector('.chat-container');
 
@@ -98,7 +97,7 @@ describe('ChatbotPage', () => {
   });
 
   it('changes button icon when entering fullscreen', () => {
-    renderWithRouter(<ChatbotPage />);
+    renderWithRouter(<HomePage />);
     const toggleButton = screen.getByRole('button', { name: /Enter fullscreen/i });
 
     expect(toggleButton).toHaveTextContent('⛶');
@@ -109,7 +108,7 @@ describe('ChatbotPage', () => {
   });
 
   it('hides header when in fullscreen mode', () => {
-    const { container } = renderWithRouter(<ChatbotPage />);
+    const { container } = renderWithRouter(<HomePage />);
     const toggleButton = screen.getByRole('button', { name: /Enter fullscreen/i });
 
     expect(screen.getByText(/Ask me about Cory's skills and experience/i)).toBeInTheDocument();
@@ -119,7 +118,7 @@ describe('ChatbotPage', () => {
   });
 
   it('maintains chat messages when toggling fullscreen', () => {
-    const { container } = renderWithRouter(<ChatbotPage />);
+    const { container } = renderWithRouter(<HomePage />);
     const toggleButton = screen.getByRole('button', { name: /Enter fullscreen/i });
 
     expect(screen.getByText(/Welcome! Ask me anything about Cory's technical skills/i)).toBeInTheDocument();

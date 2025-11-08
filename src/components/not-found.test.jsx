@@ -33,26 +33,26 @@ describe('NotFound Component', () => {
     expect(screen.getByText('404')).toBeInTheDocument();
   });
 
-  test('renders Killroy message with link', () => {
+  test('renders Kilroy message with link', () => {
     // Arrange & Act
     render(<NotFound />);
 
     // Assert
-    const killroyText = screen.getByText(/Killroy/);
-    expect(killroyText).toBeInTheDocument();
+    const kilroyText = screen.getByText(/Kilroy/);
+    expect(kilroyText).toBeInTheDocument();
 
-    const killroyLink = screen.getByRole('link', { name: 'Killroy' });
-    expect(killroyLink).toHaveAttribute('href', 'https://en.wikipedia.org/wiki/Kilroy_was_here');
+    const kilroyLink = screen.getByRole('link', { name: 'Kilroy' });
+    expect(kilroyLink).toHaveAttribute('href', 'https://en.wikipedia.org/wiki/Kilroy_was_here');
   });
 
-  test('renders Killroy image', () => {
+  test('renders Kilroy image', () => {
     // Arrange & Act
     render(<NotFound />);
 
     // Assert
-    const killroyImage = screen.getByAltText('Killroy');
-    expect(killroyImage).toBeInTheDocument();
-    expect(killroyImage).toHaveAttribute('src', '/images/killroy.svg');
+    const kilroyImage = screen.getByAltText('Kilroy');
+    expect(kilroyImage).toBeInTheDocument();
+    expect(kilroyImage).toHaveAttribute('src', '/images/killroy.svg');
   });
 
   test('component mounts and unmounts without errors', () => {
@@ -88,7 +88,7 @@ describe('NotFound Component', () => {
     const h3 = screen.getByRole('heading', { level: 3 });
 
     expect(h2).toHaveTextContent('404');
-    expect(h3).toHaveTextContent(/Killroy/);
+    expect(h3).toHaveTextContent(/Kilroy/);
   });
 
 });

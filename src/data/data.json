@@ -1,25 +1,8 @@
 {
-    "categories": [
-        {
-            "name": "Dev",
-            "path": "/dev",
-            "image": "/images/dev/vi-1-thumb.jpg"
-        },
-        {
-            "name": "Design",
-            "path": "/design",
-            "image": "/images/design/washed-away-thumb.jpg"
-        },
-        {
-            "name": "Photo",
-            "path": "/photo",
-            "image": "/images/photo/garden-thumb.jpg"
-        }
-    ],
     "dev": {
 		"name": "Dev",
 		"path": "/dev",
-		"image": "/images/dev/vi-1-thumb.jpg",
+		"image": "/images/dev/vpp-2.jpg",
 		"items": [
 			{
 				"name": "J&J",
@@ -31,7 +14,7 @@
 						"/images/dev/vpp-1.jpg",
 						"/images/dev/vpp-2.jpg"
 					],
-					"desc": "Software Tech Lead (2023 - 2025): Cory is currently serving as a Software Tech Lead within the J&J MedTech division, overseeing multiple teams and offering technical guidance. He leads a team that is building an iOS app designed to connect to a medical device, contributing to the development of innovative solutions within the MedTech space. Although his recent experience has centered on backend API development in Java, his current role is focused primarily on team leadership and maintaining technical alignment. In his position, Cory also leads the Sustaining team, a crucial part of the VELYS Digital ecosystem responsible for maintaining the security and stability of services and the codebase. His team focuses on addressing bugs, updating frameworks and dependencies proactively, and ensuring the overall security and mitigation of vulnerabilities. Cory actively contributes to onboarding new customers, facilitating a seamless transition into the VELYS Digital ecosystem, and provides top-notch support to the Product Support team, diligently resolving customer issues and delivering exceptional assistance."
+					"desc": "Software Tech Lead (2023 - 2025): Cory served as a Software Tech Lead within the J&J MedTech division, overseeing multiple teams and offering technical guidance. He led a team that was building an iOS app designed to connect to a medical device, contributing to the development of innovative solutions within the MedTech space. Although his recent experience had centered on backend API development in Java, his role was focused primarily on team leadership and maintaining technical alignment. In this position, Cory also led the Sustaining team, a crucial part of the VELYS Digital ecosystem responsible for maintaining the security and stability of services and the codebase. His team focused on addressing bugs, updating frameworks and dependencies proactively, and ensuring the overall security and mitigation of vulnerabilities. Cory actively contributed to onboarding new customers, facilitating a seamless transition into the VELYS Digital ecosystem, and provided top-notch support to the Product Support team, diligently resolving customer issues and delivering exceptional assistance."
 				}
 			},
 			{
@@ -43,7 +26,7 @@
 						"/images/dev/fitbit-home.jpg",
 						"/images/dev/fitbit-ionic.jpg"
 					],
-					"desc": "Software Engineer (2019 - 2023): Cory was a member of the Core Tools team at Google + Fitbit. The team built and maintained an internal support tool and the backend that powers it. Customer support agents use this tool to diagnose issues with customers' Fitbit devices. The work included the writing and maintaining of backend apis as well as adding new features to and maintaining the front-end Ember app.<br><br>Front-end Engineer (2015 - 2019): Cory had worked on many aspects of the fitbit.com website. The store, shop pages, product pages, new product launches, holiday campaigns and the blog are just a few of the areas he has worked on. The stack fitbit.com was built on includes Javascript, Mithril, HTML5, CSS3, Lodash and Metalsmith."
+					"desc": "Software Engineer (2019 - 2023): Cory was a member of the Core Tools team at Google + Fitbit. The team built and maintained an internal support tool and the backend that powered it. Customer support agents used this tool to diagnose issues with customers' Fitbit devices. The work included the writing and maintaining of backend apis as well as adding new features to and maintaining the front-end Ember app.<br><br>Front-end Engineer (2015 - 2019): Cory worked on many aspects of the fitbit.com website. The store, shop pages, product pages, new product launches, holiday campaigns and the blog were just a few of the areas he worked on. The stack fitbit.com was built on included Javascript, Mithril, HTML5, CSS3, Lodash and Metalsmith."
 				}
 			},
 			{
@@ -155,8 +138,7 @@
 				"subContent": {
 					"images": [
 						"/images/dev/evans-open.jpg"
-					],
-					"link": "http://www.evansopen.com/"
+					]
 				}
 			}
 		]
@@ -374,6 +356,39 @@
                 ]
             }
         }
+		]
+	},
+    "ai": {
+		"name": "AI",
+		"path": "/ai",
+		"image": "/images/ai/ai-thumb.jpg",
+		"items": [
+			{
+				"name": "Portfolio Chatbot Backend",
+				"url": "/ai/portfolio-chatbot-backend",
+				"thumbPath": "/images/ai/chatbot-thumb.jpg",
+				"subContent": {
+					"images": [
+						"/images/ai/chatbot-1.jpg"
+					],
+					"desc": "An AI-powered chatbot backend that serves as an interactive, AI-driven resume and portfolio. Built with FastAPI and Python 3.11+, the chatbot uses Groq API with Llama 3.1 8B Instant model for ultra-fast inference and implements a Retrieval-Augmented Generation (RAG) pipeline with ChromaDB vector database for semantic search.<br><br>Try it out on the <a href='/' target='_self'>homepage</a> of this site! Ask the chatbot questions about Cory's technical skills, work experience, leadership approach, or any projects listed in this portfolio. The chatbot has been trained on comprehensive professional information and can provide detailed, contextual responses about his background and expertise.<br><br>The system features production optimizations including Redis caching, GZIP compression for 70% smaller responses, streaming responses, and rate limiting. Deployed on Google Cloud Run with automated CI/CD via Cloud Build, the chatbot achieves response times under 1 second and includes CORS protection restricting access to coryfitzpatrick.com. The architecture supports multi-turn conversations with context awareness and includes bot protection middleware.<br><br><a href='https://github.com/coryfitzpatrick/coryfitzpatrick-ai-backend' target='_blank' rel='noopener noreferrer'>View the source code on GitHub</a><br><br><a href='/'>Try it for yourself</a>"
+				}
+			},
+			{
+				"name": "AI Cover Letter Generator",
+				"url": "/ai/cover-letter-generator",
+				"thumbPath": "/images/ai/cover-letter-generator-1.jpg",
+				"subContent": {
+					"images": [
+						"/images/ai/cover-letter-generator-1.jpg",
+						"/images/ai/cover-letter-generator-2.jpg",
+						"/images/ai/cover-letter-generator-3.jpg",
+						"/images/ai/cover-letter-generator-4.jpg",
+						"/images/ai/cover-letter-generator-5.jpg"
+					],
+					"desc": "A sophisticated CLI tool designed to streamline job application preparation by creating customized cover letters using AI. The system analyzes a user's professional background and matches it with job descriptions to produce tailored application materials.<br><br><strong>How to Use:</strong> After installing via pip, run the interactive CLI with <code>cover-letter-cli</code>. The tool will guide you through loading your professional documents (resume PDFs, LinkedIn exports, or JSON files). When ready, simply paste a job posting URL and the tool automatically scrapes the webpage to extract the company name, job title, and full job description—no manual copy-pasting required. The AI then generates a customized cover letter tailored to that specific position. You can provide feedback to refine the output iteratively until you're satisfied with the results. The final cover letter is automatically saved as a PDF in a folder named '{Company} - {Job Title}'.<br><br><strong>Technical Details:</strong> Built with Python 3.11+, the tool uses Groq's Llama 3.3 70B Versatile model for text generation and implements Retrieval-Augmented Generation (RAG) with ChromaDB for storing and retrieving document embeddings. This RAG approach ensures the AI generates content based on your actual professional experience rather than generic templates. The intelligent web scraping automatically parses job posting pages to extract relevant information, streamlining the entire application process. The system supports multiple input formats including PDFs (resumes, achievement documents), LinkedIn CSV exports, and JSON files containing professional information.<br><br><strong>Key Features:</strong> Automatic job posting scraping from URLs, intelligent extraction of company name and job title, interactive CLI for generation with iterative refinement through user feedback, automatic PDF generation organized into folders named '{Company} - {Job Title}', Google Drive integration for cloud storage, and customizable system prompts for controlling tone and style.<br><br><a href='https://github.com/coryfitzpatrick/ai-cover-letter-generator' target='_blank' rel='noopener noreferrer'>View the source code on GitHub</a>"
+				}
+			}
 		]
 	}
 }

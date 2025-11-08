@@ -27,6 +27,24 @@
 		}
 	}
 
+	&.grid-d-6,
+	&.grid-d-12 {
+        figure img {
+            max-width: 880px;
+            bottom: 108px;
+            transform: translate(-50%, 0);
+
+            @media screen and (max-width: 1024px) {
+                bottom: 30px;
+                width: 680px;
+            }
+        }
+
+        figcaption {
+            bottom: -10px;
+        }
+	}
+
 	figcaption {
 		position: absolute;
 		left: 0;
@@ -37,7 +55,7 @@
 		display: flex;
 		align-items: center;
 		height: 100px;
-		width: 101%;
+		width: 100%;
 
 		h2 {
 			color: #fff;

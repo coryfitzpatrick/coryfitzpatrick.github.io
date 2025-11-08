@@ -1,53 +1,70 @@
-import React from 'react';
+import React, { useMemo } from 'react';
+import DOMPurify from 'dompurify';
 import portfolioData from '../data/data.json';
+import PropTypes from 'prop-types';
+import { toKebabCase } from '../utils/string';
 
-export default class DetailItemContent extends React.Component {
-    render() {
-        const path = this.props.location.pathname;
+export default function DetailItem({ location }) {
+    const detailData = useMemo(() => {
+        const path = location.pathname;
         const category = path.split('/')[1];
-        const objectNum = portfolioData[category].items.findIndex(item => item.url === path);
-        const detailItem = portfolioData[category].items[objectNum];
-        const subContent = detailItem.subContent;
-        let subContentTitle;
-        let subContentLink;
-        let subContentDesc;
-        let subContentVideo;
+        const categoryData = portfolioData[category];
 
-        if (subContent.link) {
-            subContentTitle = <h2><a href={subContent.link} target="_blank" rel="noopener noreferrer">{detailItem.name}</a></h2>;
-            subContentLink = <a className="detail-link" href={subContent.link} target="_blank" rel="noopener noreferrer">Visit The Site: {subContent.link}</a>;
-        } else {
-            subContentTitle = <h2>{detailItem.name}</h2>;
+        if (!categoryData) {
+            return null;
         }
 
-        if (subContent.desc) {
-            subContentDesc = <p dangerouslySetInnerHTML={{__html: subContent.desc}}></p>;
-        }
+        const item = categoryData.items.find(item => item.url === path);
+        return item || null;
+    }, [location.pathname]);
 
-        if (subContent.videoLink) {
-            subContentVideo = <video preload="true" controls>      
-                 <source src={`${subContent.videoLink}.webm`} type='video/webm; codecs="vp8, vorbis"' />
-                 <source src={`${subContent.videoLink}.mp4`} type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"' />
-                 This web browser does not support HTML5.    
-            </video>;
-        }
-
+    if (!detailData) {
         return (
             <div id="sub-content">
                 <div className="grid-d-12">
-                    {subContentTitle}
-                    {subContentDesc}
-                    {subContentLink} 
-                    {subContentVideo}
-
-                    <div className="images">
-                        {subContent.images.map(image => (
-                            <img key={image} src={image} alt="" />
-                        ))}
-                    </div>               
+                    <h2>Item not found</h2>
                 </div>
             </div>
         );
     }
+
+    const { subContent, name } = detailData;
+    const sanitizedDesc = subContent.desc ? DOMPurify.sanitize(subContent.desc) : '';
+    const itemClass = toKebabCase(name);
+
+    return (
+        <div id="sub-content" className={itemClass}>
+            <div className="grid-d-12">
+                <h2>{name}</h2>
+
+                {subContent.desc && (
+                    <p dangerouslySetInnerHTML={{ __html: sanitizedDesc }}></p>
+                )}
+
+                {subContent.videoLink && (
+                    <video preload="true" controls>
+                        <source src={`${subContent.videoLink}.webm`} type='video/webm; codecs="vp8, vorbis"' />
+                        <source src={`${subContent.videoLink}.mp4`} type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"' />
+                        This web browser does not support HTML5.
+                    </video>
+                )}
+
+                <div className="images">
+                    {subContent.images.map((image, index) => (
+                        <img
+                            key={image}
+                            src={image}
+                            alt={`${name} - Image ${index + 1}`}
+                        />
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
 }
 
+DetailItem.propTypes = {
+    location: PropTypes.shape({
+        pathname: PropTypes.string.isRequired,
+    }).isRequired,
+};
