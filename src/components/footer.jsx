@@ -1,7 +1,7 @@
 import React from 'react';
 import { CONTACT_INFO } from '../constants/contact';
 
-export default function Footer() {
+const Footer = React.memo(function Footer() {
     const currentYear = new Date().getFullYear();
 
     return (
@@ -19,4 +19,6 @@ export default function Footer() {
             </div>
         </footer>
     );
-}
+});
+
+export default Footer;

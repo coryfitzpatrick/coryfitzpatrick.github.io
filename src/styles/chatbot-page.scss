@@ -1,3 +1,23 @@
+// Screen reader only class - visually hidden but accessible to screen readers
+.sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border-width: 0;
+}
+
+// Enhanced focus styles for keyboard navigation (ADA compliance)
+button:focus-visible,
+textarea:focus-visible {
+	outline: 2px solid #777;
+	outline-offset: 2px;
+}
+
 #content .container {
 	max-width: 100%;
 }
@@ -179,6 +199,69 @@
 			font-size: 15px;
 		}
 	}
+
+	.tts-button {
+		background: transparent;
+		border: 2px solid rgba(255, 255, 255, 0.4);
+		color: #fff;
+		width: 36px;
+		height: 36px;
+		min-width: 36px;
+		min-height: 36px;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 16px;
+		transition: all 0.2s;
+		flex-shrink: 0;
+		padding: 0;
+		align-self: flex-start;
+
+		.speaker-icon {
+			width: 20px;
+			height: 20px;
+			filter: invert(47%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(87%);
+			transition: filter 0.2s ease;
+		}
+
+		@media screen and (max-width: 768px) {
+			width: 32px;
+			height: 32px;
+			min-width: 32px;
+			min-height: 32px;
+			font-size: 14px;
+
+			.speaker-icon {
+				width: 18px;
+				height: 18px;
+			}
+		}
+
+		&:hover {
+			background: rgba(255, 255, 255, 0.1);
+			border-color: rgba(255, 255, 255, 1);
+
+			.speaker-icon {
+				filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);
+			}
+		}
+
+		&.speaking {
+			background: #3a3838;
+			border-color: #777;
+			animation: pulse 1.5s ease-in-out infinite;
+		}
+	}
+}
+
+@keyframes pulse {
+	0%, 100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.6;
+	}
 }
 
 @keyframes fadeIn {
@@ -236,6 +319,9 @@
 	min-height: 24px;
 	max-height: 200px;
 	line-height: 1.5;
+	white-space: nowrap;
+	overflow-x: auto;
+	overflow-y: hidden;
 
 	@media screen and (max-width: 768px) {
 		font-size: 16px; // Prevents zoom on iOS
@@ -248,6 +334,49 @@
 	&:disabled {
 		opacity: 0.6;
 		cursor: not-allowed;
+	}
+}
+
+.chat-voice-input {
+	background: transparent;
+	border: 2px solid rgba(255, 255, 255, 0.4);
+	color: #fff;
+	width: 40px;
+	height: 40px;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 19px;
+	transition: all 0.2s ease;
+	flex-shrink: 0;
+
+	.mic-icon {
+		width: 20px;
+		height: 20px;
+		filter: invert(47%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(87%);
+		transition: filter 0.2s ease;
+	}
+
+	&:hover:not(:disabled) {
+		border-color: rgba(255, 255, 255, 1);
+		background: rgba(255, 255, 255, 0.1);
+
+		.mic-icon {
+			filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);
+		}
+	}
+
+	&:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+
+	&.listening {
+		background: #ff4444;
+		border-color: #ff4444;
+		color: #fff;
+		animation: pulse 1.5s ease-in-out infinite;
 	}
 }
 

@@ -1,19 +1,90 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import RobotIcon from './robot-icon';
 import { trackEvent } from '../utils/analytics';
+import { logger } from '../utils/logger';
 import { API_URLS, EXAMPLE_QUESTIONS, CHAT_CONFIG } from '../constants/chatbot';
+
+// Speech synthesis configuration constants
+const SPEECH_CONFIG = {
+    rate: 0.92,    // Slower pace = more natural and easier to understand
+    pitch: 0.95,   // Slightly lower pitch = less robotic, more human
+    volume: 1.0
+};
+
+// Timing constants (in milliseconds)
+const TIMING = {
+    EXAMPLE_SUBMIT_DELAY: 0,   // Immediate submit for example questions
+    VOICE_SUBMIT_DELAY: 500    // Brief delay to show transcription before auto-submit
+};
 
 export default function Chatbot() {
     const [messages, setMessages] = useState([]);
     const [inputValue, setInputValue] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isFullscreen, setIsFullscreen] = useState(false);
+    const [speakingMessageId, setSpeakingMessageId] = useState(null);
+    const [isListening, setIsListening] = useState(false);
     const messagesEndRef = useRef(null);
     const isMountedRef = useRef(true);
+    const speechSynthesisRef = useRef(null);
+    const speechRecognitionRef = useRef(null);
+
+    // Memoize the preferred voice selection for performance
+    const preferredVoice = useMemo(() => {
+        if (!('speechSynthesis' in window)) return null;
+
+        const voices = window.speechSynthesis.getVoices();
+
+        // Priority order for most human-sounding voices
+        return (
+            // Top tier: Google UK/US voices (most natural)
+            voices.find(voice =>
+                voice.lang.startsWith('en') &&
+                voice.name.includes('Google') &&
+                (voice.name.includes('UK') || voice.name.includes('US'))
+            ) ||
+            // macOS: Samantha (very natural female voice)
+            voices.find(voice => voice.name.includes('Samantha')) ||
+            // Windows: Microsoft neural voices
+            voices.find(voice =>
+                voice.lang.startsWith('en') &&
+                (voice.name.includes('Natural') || voice.name.includes('Neural'))
+            ) ||
+            // macOS: Other enhanced voices
+            voices.find(voice =>
+                voice.lang.startsWith('en') &&
+                (voice.name.includes('Enhanced') || voice.name.includes('Premium'))
+            ) ||
+            // Fallback: Any English voice
+            voices.find(voice => voice.lang.startsWith('en-US')) ||
+            voices.find(voice => voice.lang.startsWith('en'))
+        );
+    }, []);
+
+    // Memoize API URL to avoid re-computing on every form submission
+    const apiUrl = useMemo(() =>
+        window.location.hostname === 'localhost'
+            ? API_URLS.development
+            : API_URLS.production,
+        []
+    );
 
     useEffect(() => {
+        // Load voices on mount (some browsers require this)
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.getVoices();
+        }
+
         return () => {
             isMountedRef.current = false;
+            // Stop any ongoing speech when component unmounts
+            if (speechSynthesisRef.current) {
+                window.speechSynthesis.cancel();
+            }
+            // Stop any ongoing speech recognition
+            if (speechRecognitionRef.current) {
+                speechRecognitionRef.current.stop();
+            }
         };
     }, []);
 
@@ -67,10 +138,6 @@ export default function Chatbot() {
         setMessages(prev => [...prev, assistantMessage]);
 
         try {
-            const apiUrl = window.location.hostname === 'localhost'
-                ? API_URLS.development
-                : API_URLS.production;
-
             const response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: {
@@ -106,9 +173,7 @@ export default function Chatbot() {
                 }
             }
         } catch (error) {
-            if (process.env.NODE_ENV !== 'production') {
-                console.error('Chatbot error:', error);
-            }
+            logger.error('Chatbot error:', error);
             if (isMountedRef.current) {
                 setMessages(prev => {
                     const newMessages = [...prev];
@@ -125,7 +190,7 @@ export default function Chatbot() {
                 setIsLoading(false);
             }
         }
-    }, [inputValue, isLoading]);
+    }, [inputValue, isLoading, apiUrl]);
 
     const handleExampleClick = useCallback((question) => {
         trackEvent('Chatbot', 'Example Question Click', question);
@@ -134,7 +199,7 @@ export default function Chatbot() {
         setTimeout(() => {
             const event = { preventDefault: () => {} };
             handleSubmit(event, question);
-        }, 0);
+        }, TIMING.EXAMPLE_SUBMIT_DELAY);
     }, [handleSubmit]);
 
     const handleKeyDown = useCallback((e) => {
@@ -144,8 +209,130 @@ export default function Chatbot() {
         }
     }, [handleSubmit]);
 
+    const handleSpeak = useCallback((messageId, text) => {
+        // Check if browser supports speech synthesis
+        if (!('speechSynthesis' in window)) {
+            alert('Sorry, your browser does not support text-to-speech.');
+            return;
+        }
+
+        // If already speaking this message, stop it
+        if (speakingMessageId === messageId) {
+            window.speechSynthesis.cancel();
+            setSpeakingMessageId(null);
+            speechSynthesisRef.current = null;
+            trackEvent('Chatbot', 'TTS Stop', 'User Action');
+            return;
+        }
+
+        // If speaking another message, stop it first
+        if (speakingMessageId) {
+            window.speechSynthesis.cancel();
+        }
+
+        // Create new utterance
+        const utterance = new SpeechSynthesisUtterance(text);
+
+        // Use the memoized preferred voice
+        if (preferredVoice) {
+            utterance.voice = preferredVoice;
+        }
+
+        // Fine-tuned parameters for more natural, conversational speech
+        utterance.rate = SPEECH_CONFIG.rate;
+        utterance.pitch = SPEECH_CONFIG.pitch;
+        utterance.volume = SPEECH_CONFIG.volume;
+
+        // Handle end of speech
+        utterance.onend = () => {
+            if (isMountedRef.current) {
+                setSpeakingMessageId(null);
+                speechSynthesisRef.current = null;
+            }
+        };
+
+        // Handle errors
+        utterance.onerror = (event) => {
+            logger.error('Speech synthesis error:', event);
+            if (isMountedRef.current) {
+                setSpeakingMessageId(null);
+                speechSynthesisRef.current = null;
+            }
+        };
+
+        speechSynthesisRef.current = utterance;
+        setSpeakingMessageId(messageId);
+        window.speechSynthesis.speak(utterance);
+        trackEvent('Chatbot', 'TTS Start', 'User Action');
+    }, [speakingMessageId, preferredVoice]);
+
+    const handleVoiceInput = useCallback(() => {
+        // Check if browser supports speech recognition
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+        if (!SpeechRecognition) {
+            alert('Sorry, your browser does not support speech recognition. Try using Chrome or Edge.');
+            return;
+        }
+
+        // If already listening, stop
+        if (isListening && speechRecognitionRef.current) {
+            speechRecognitionRef.current.stop();
+            setIsListening(false);
+            trackEvent('Chatbot', 'Voice Input Stop', 'User Action');
+            return;
+        }
+
+        // Create new recognition instance
+        const recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'en-US';
+
+        recognition.onstart = () => {
+            if (isMountedRef.current) {
+                setIsListening(true);
+                trackEvent('Chatbot', 'Voice Input Start', 'User Action');
+            }
+        };
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            if (isMountedRef.current) {
+                setInputValue(transcript);
+                trackEvent('Chatbot', 'Voice Input Success', transcript);
+
+                // Auto-submit the question after a brief delay to show the transcription
+                setTimeout(() => {
+                    const submitEvent = { preventDefault: () => {} };
+                    handleSubmit(submitEvent, transcript);
+                }, TIMING.VOICE_SUBMIT_DELAY);
+            }
+        };
+
+        recognition.onerror = (event) => {
+            logger.error('Speech recognition error:', event.error);
+            if (isMountedRef.current) {
+                setIsListening(false);
+                if (event.error !== 'no-speech' && event.error !== 'aborted') {
+                    alert(`Speech recognition error: ${event.error}`);
+                }
+                trackEvent('Chatbot', 'Voice Input Error', event.error);
+            }
+        };
+
+        recognition.onend = () => {
+            if (isMountedRef.current) {
+                setIsListening(false);
+            }
+        };
+
+        speechRecognitionRef.current = recognition;
+        recognition.start();
+    }, [isListening, handleSubmit]);
+
     return (
-        <div id="chat-bot" className={`chat-container ${isFullscreen ? 'fullscreen' : ''}`}>
+        <div id="chat-bot" className={`chat-container ${isFullscreen ? 'fullscreen' : ''}`} role="region" aria-label="Interactive chatbot">
             {!isFullscreen && (
                 <div className="chat-header">
                     <h2>{CHAT_CONFIG.headerTitle}</h2>
@@ -153,7 +340,7 @@ export default function Chatbot() {
                 </div>
             )}
 
-            <div className="chat-messages">
+            <div className="chat-messages" role="log" aria-live="polite" aria-atomic="false">
                 <button
                     className="fullscreen-toggle"
                     onClick={toggleFullscreen}
@@ -163,7 +350,7 @@ export default function Chatbot() {
                 </button>
 
                 {messages.length === 0 && (
-                    <div className="welcome-message">
+                    <div className="welcome-message" role="region" aria-label="Welcome message and example questions">
                         <p>{CHAT_CONFIG.welcomeMessage}</p>
 
                         <div className="example-questions">
@@ -173,6 +360,7 @@ export default function Chatbot() {
                                     key={question}
                                     onClick={() => handleExampleClick(question)}
                                     className="example-question"
+                                    aria-label={`Ask: ${question}`}
                                 >
                                     {question}
                                 </button>
@@ -184,20 +372,45 @@ export default function Chatbot() {
                 {messages.map((message, index) => {
                     const isLastMessage = index === messages.length - 1;
                     const isLoadingMessage = isLastMessage && message.role === 'assistant' && !message.content && isLoading;
+                    const isSpeaking = speakingMessageId === message.id;
+                    const canSpeak = message.role === 'assistant' && message.content && !isLoadingMessage;
 
                     return (
-                        <div key={message.id} className={`message ${message.role}`}>
-                            <div className="message-avatar">
+                        <div
+                            key={message.id}
+                            className={`message ${message.role}`}
+                            role="article"
+                            aria-label={message.role === 'user' ? 'Your message' : 'Assistant response'}
+                        >
+                            <div className="message-avatar" aria-hidden="true">
                                 {message.role === 'user' ? '👤' : <RobotIcon />}
                             </div>
 
                             {isLoadingMessage && (
-                                <div className="loading-spinner"></div>
+                                <div className="loading-spinner" role="status" aria-label="Loading response">
+                                    <span className="sr-only">Loading response...</span>
+                                </div>
                             )}
 
                             <div className="message-content">
                                 {message.content}
                             </div>
+
+                            {canSpeak && (
+                                <button
+                                    className={`tts-button ${isSpeaking ? 'speaking' : ''}`}
+                                    onClick={() => handleSpeak(message.id, message.content)}
+                                    aria-label={isSpeaking ? 'Stop speaking' : 'Read message aloud'}
+                                    title={isSpeaking ? 'Stop speaking' : 'Read message aloud'}
+                                    aria-pressed={isSpeaking}
+                                >
+                                    {isSpeaking ? (
+                                        <span aria-hidden="true">⏸</span>
+                                    ) : (
+                                        <img src="/images/speaker.svg" alt="" aria-hidden="true" className="speaker-icon" />
+                                    )}
+                                </button>
+                            )}
                         </div>
                     );
                 })}
@@ -205,7 +418,7 @@ export default function Chatbot() {
                 <div ref={messagesEndRef} />
             </div>
 
-            <form onSubmit={handleSubmit} className="chat-input-container">
+            <form onSubmit={handleSubmit} className="chat-input-container" aria-label="Send message">
                 <div className="chat-input-wrapper">
                     <textarea
                         value={inputValue}
@@ -219,11 +432,24 @@ export default function Chatbot() {
                     />
 
                     <button
+                        type="button"
+                        className={`chat-voice-input ${isListening ? 'listening' : ''}`}
+                        onClick={handleVoiceInput}
+                        disabled={isLoading}
+                        aria-label={isListening ? 'Stop listening' : 'Start voice input'}
+                        title={isListening ? 'Stop listening' : 'Speak your question'}
+                        aria-pressed={isListening}
+                    >
+                        {isListening ? '⏹' : <img src="/images/microphone.svg" alt="" aria-hidden="true" className="mic-icon" />}
+                    </button>
+
+                    <button
                         type="submit"
                         className="chat-submit"
                         disabled={isLoading || !inputValue.trim()}
+                        aria-label={isLoading ? 'Sending message...' : 'Send message'}
                     >
-                        {isLoading ? '⏳' : '➤'}
+                        <span aria-hidden="true">{isLoading ? '⏳' : '➤'}</span>
                     </button>
                 </div>
             </form>

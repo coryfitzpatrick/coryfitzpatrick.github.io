@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function RobotIcon() {
+const RobotIcon = React.memo(function RobotIcon() {
     return (
         <svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-label="Chatbot robot head icon">
             <defs>
@@ -75,4 +75,6 @@ export default function RobotIcon() {
             </g>
         </svg>
     );
-}
+});
+
+export default RobotIcon;
